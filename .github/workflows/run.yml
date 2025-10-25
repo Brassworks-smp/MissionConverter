@@ -17,10 +17,10 @@ jobs:
         run: curl -o itemlist_dump.txt "https://raw.githubusercontent.com/serverside-swzo/Brassworks-SMP-Season-2/refs/heads/master/itemlist_dump.txt"
 
       - name: Make Binary Executable
-        run: chmod +x missionconverter
+        run: chmod +x mission_converter
     
       - name: Run mission converter binary
-        run: ./missionconverter
+        run: ./mission_converter
         
       - name: Upload missions.json artifact
         uses: actions/upload-artifact@v4
