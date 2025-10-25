@@ -1,14 +1,16 @@
 # Name this workflow
-name: Build C++ for Linux (x86)
+name: Build C++ for Linux (x86_64)
 
-# Set the event that triggers this workflow
 on:
-  push: # Run on every push to any branch
+  push:
     branches:
       - main
-  pull_request: # Also run on pull requests
+  pull_request:
     branches:
       - main
+  # --- Add this ---
+  # Allows you to run this workflow from another workflow
+  workflow_call:
 
 jobs:
   build:
@@ -16,54 +18,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Check out your repository's code (main.cpp, CMakeLists.txt, etc.)
+      # 1. Check out your repository's code
       - name: Check out code
         uses: actions/checkout@v4
 
-      # 2. Install 32-bit build dependencies
-      #    We need:
-      #    - g++-multilib: For 32-bit C++ compiler
-      #    - cmake & build-essential: For running CMake/make
-      #    - libssl-dev:i386: 32-bit OpenSSL dev libraries
-      #    - zlib1g-dev:i386: 32-bit Zlib dev libraries
-      - name: Install 32-bit build dependencies
+      # 2. Install 64-bit build dependencies (this is simpler)
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y g++-multilib cmake build-essential libssl-dev:i386 zlib1g-dev:i386
+          # Install standard 64-bit versions of the libraries
+          sudo apt-get install -y g++ cmake build-essential libssl-dev zlib1g-dev
 
-      # 3. Download header-only dependencies (httplib.h, json.hpp, csv.h)
-      #    These are still needed so CMake can find them
+      # 3. Download header-only dependencies
       - name: Download Header Dependencies
         run: |
           curl -L "https://raw.githubusercontent.com/yhirose/cpp-httplib/master/httplib.h" -o httplib.h
           curl -L "https://github.com/nlohmann/json/releases/latest/download/json.hpp" -o json.hpp
           curl -L "https://raw.githubusercontent.com/vincentlaucsien/csv-parser/master/single_include/csv.h" -o csv.h
           
-      # 4. Configure CMake
-      #    - We create a 'build' directory
-      #    - We pass the -m32 flags to CMAKE C/CXX_FLAGS to force 32-bit build
+      # 4. Configure CMake (no 32-bit flags)
       - name: Configure CMake
-        run: >
-          cmake -S . -B build
-          -DCMAKE_CXX_FLAGS="-m32"
-          -DCMAKE_C_FLAGS="-m32"
-          -DCMAKE_EXE_LINKER_FLAGS="-m32"
+        run: cmake -S . -B build
 
       # 5. Build with CMake
-      #    This runs 'make' (or similar) inside the 'build' directory
       - name: Build with CMake
         run: cmake --build build
 
-      # 6. (Optional) List files to verify build output
-      - name: List files
-        run: ls -l build/bin/
-
-      # 7. Upload the compiled binary as an artifact
-      #    The path now points to the output directory set in your CMakeLists.txt
+      # 6. Upload the 64-bit binary as an artifact
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          # This is the name of the artifact file you'll see in GitHub
-          name: linux-x86-binary
-          # This is the path to the file you want to upload
+          # Use a clear name for the 64-bit binary
+          name: linux-x86_64-binary
           path: build/bin/mission_converter
