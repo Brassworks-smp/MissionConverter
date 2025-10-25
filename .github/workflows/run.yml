@@ -1,0 +1,29 @@
+name: Generate Missions JSON
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-missions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download itemlist_dump.txt
+        run: curl -o itemlist_dump.txt "https://raw.githubusercontent.com/serverside-swzo/Brassworks-SMP-Season-2/refs/heads/master/itemlist_dump.txt"
+
+      - name: Make Binary Executable
+        run: chmod +x missionconverter
+    
+      - name: Run mission converter binary
+        run: ./missionconverter
+        
+      - name: Upload missions.json artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: missions-json
+          path: missions.json
