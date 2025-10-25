@@ -8,35 +8,32 @@ on:
   pull_request:
     branches:
       - main
-  # --- Add this ---
-  # Allows you to run this workflow from another workflow
   workflow_call:
 
 jobs:
   build:
-    # Use the latest Ubuntu runner (which is 64-bit)
     runs-on: ubuntu-latest
-
     steps:
       # 1. Check out your repository's code
       - name: Check out code
         uses: actions/checkout@v4
 
-      # 2. Install 64-bit build dependencies (this is simpler)
+      # 2. Install 64-bit build dependencies
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          # Install standard 64-bit versions of the libraries
           sudo apt-get install -y g++ cmake build-essential libssl-dev zlib1g-dev
 
       # 3. Download header-only dependencies
       - name: Download Header Dependencies
         run: |
-          curl -L "https://raw.githubusercontent.com/yhirose/cpp-httplib/master/httplib.h" -o httplib.h
-          curl -L "https://github.com/nlohmann/json/releases/latest/download/json.hpp" -o json.hpp
-          curl -L "https://raw.githubusercontent.com/vincentlaucsien/csv-parser/master/single_include/csv.h" -o csv.h
+          # --- FIX ---
+          # Add --fail to make curl exit with an error if the download fails (e.g., 404)
+          curl --fail -L "https://raw.githubusercontent.com/yhirose/cpp-httplib/master/httplib.h" -o httplib.h
+          curl --fail -L "https://github.com/nlohmann/json/releases/latest/download/json.hpp" -o json.hpp
+          curl --fail -L "https://raw.githubusercontent.com/vincentlaucsien/csv-parser/master/single_include/csv.h" -o csv.h
           
-      # 4. Configure CMake (no 32-bit flags)
+      # 4. Configure CMake
       - name: Configure CMake
         run: cmake -S . -B build
 
@@ -48,6 +45,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          # Use a clear name for the 64-bit binary
           name: linux-x86_64-binary
           path: build/bin/mission_converter
