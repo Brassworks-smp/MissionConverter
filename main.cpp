@@ -28,19 +28,19 @@ const std::string OUTPUT_JSON_PATH = "missions.json";
 const json CATEGORY_MAP = {
     {"Small", {
         {"weight", 10.0},
-        {"reward", {{"minAmount", 2}, {"maxAmount", 6}}}
+        {"reward", {{"minAmount", 2}, {"maxAmount", 3}}}
     }},
     {"Medium", {
         {"weight", 8.0},
-        {"reward", {{"minAmount", 4}, {"maxAmount", 8}}}
+        {"reward", {{"minAmount", 4}, {"maxAmount", 6}}}
     }},
     {"Large", {
         {"weight", 6.0},
-        {"reward", {{"minAmount", 6}, {"maxAmount", 9}}}
+        {"reward", {{"minAmount", 6}, {"maxAmount", 8}}}
     }},
     {"Extremely Rare", {
         {"weight", 1.0},
-        {"reward", {{"minAmount", 10}, {"maxAmount", 15}}}
+        {"reward", {{"minAmount", 9}, {"maxAmount", 13}}}
     }}
 };
 
